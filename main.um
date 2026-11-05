@@ -1,3 +1,21 @@
+import (
+    "std.um"
+    f = "flags.um"
+)
+
+fn usage(stream: std::File, flags: ^f::Flags) {
+    fprintf(stream, "Usage: ./example [OPTIONS] [--] [ARGS]\n")
+    fprintf(stream, "OPTIONS:\n")
+    f::display_flag_options(stream, flags)
+}
+
 fn main() {
-    printf("Hello!")
+    flags := f::init_flags();
+    flags.add("help", "false", "Print this help to stdout and exit with 0")
+
+    for _, flag in flags.list {
+        printf("--%s\n", flag.name)
+    }
+
+    usage(std::stdout(), flags)
 }

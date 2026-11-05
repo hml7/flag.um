@@ -1,0 +1,56 @@
+import "std.um"
+
+type Flag* = struct {
+    name: str
+    desc: str
+    val: any
+}
+
+type Flags* = struct {
+    list: []Flag
+}
+
+fn (flags: ^Flags) add*(name: str, val: any, desc: str)
+fn init_flags*(): ^Flags
+fn new_flag(name: str, val: any, desc: str): ^Flag
+fn flag_type_name(val: any): str
+fn display_flag_options*(stream: std::File, flags: ^Flags)
+
+fn (flags: ^Flags) add*(name: str, val: any, desc: str) {
+    flag := new_flag(name, val, desc)
+    flags.list = append(flags.list, flag^)
+}
+
+fn init_flags*(): ^Flags {
+    flags := new(Flags)
+    return flags
+}
+
+fn new_flag(name: str, val: any, desc: str): ^Flag {
+    flag := new(Flag)
+    flag.name = name
+    flag.desc = desc
+    flag.val = val
+    return flag
+}
+
+fn flag_type_name(val: any): str {
+    switch v := type(val) {
+        case str:
+            return "str"
+        case int:
+            return "int"
+        case bool:
+            return "bool"
+        case real:
+            return "real"
+    }
+    return "fuck did you do"
+}
+
+fn display_flag_options*(stream: std::File, flags: ^Flags) {
+    for _, flag in flags.list {
+        fprintf(stream, "    --%s <%s>\n", flag.name, flag_type_name(flag.val))
+        fprintf(stream, "        %s\n", flag.desc)
+    }
+}
