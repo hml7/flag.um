@@ -1,6 +1,6 @@
 import (
     "std.um"
-    f = "flags.um"
+    f = "flag.um"
 )
 
 fn usage(stream: std::File, flags: ^f::Flags) {
