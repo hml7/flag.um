@@ -2,22 +2,22 @@ import "std.um"
 
 type Flag* = struct {
     name: str
+    def: any
     desc: str
-    val: any
 }
 
 type Flags* = struct {
     list: []Flag
 }
 
-fn (flags: ^Flags) add*(name: str, val: any, desc: str)
+fn (flags: ^Flags) add*(name: str, def: any, desc: str)
 fn init_flags*(): ^Flags
-fn new_flag(name: str, val: any, desc: str): ^Flag
+fn new_flag(name: str, def: any, desc: str): ^Flag
 fn flag_type_name(val: any): str
 fn display_flag_options*(stream: std::File, flags: ^Flags)
 
-fn (flags: ^Flags) add*(name: str, val: any, desc: str) {
-    flag := new_flag(name, val, desc)
+fn (flags: ^Flags) add*(name: str, def: any, desc: str) {
+    flag := new_flag(name, def, desc)
     flags.list = append(flags.list, flag^)
 }
 
@@ -26,16 +26,16 @@ fn init_flags*(): ^Flags {
     return flags
 }
 
-fn new_flag(name: str, val: any, desc: str): ^Flag {
+fn new_flag(name: str, def: any, desc: str): ^Flag {
     flag := new(Flag)
     flag.name = name
+    flag.def = def
     flag.desc = desc
-    flag.val = val
     return flag
 }
 
-fn flag_type_name(val: any): str {
-    switch v := type(val) {
+fn flag_type_name(def: any): str {
+    switch v := type(def) {
         case str:
             return "str"
         case int:
@@ -50,7 +50,7 @@ fn flag_type_name(val: any): str {
 
 fn display_flag_options*(stream: std::File, flags: ^Flags) {
     for _, flag in flags.list {
-        fprintf(stream, "    --%s <%s>\n", flag.name, flag_type_name(flag.val))
+        fprintf(stream, "    --%s <%s>\n", flag.name, flag_type_name(flag.def))
         fprintf(stream, "        %s\n", flag.desc)
     }
 }
