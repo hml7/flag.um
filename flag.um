@@ -11,19 +11,31 @@ type Flags* = struct {
 }
 
 fn (flags: ^Flags) add*(name: str, def: any, desc: str)
+fn (flags: ^Flags) parse*(): []str
 fn init_flags*(): ^Flags
 fn new_flag(name: str, def: any, desc: str): ^Flag
 fn flag_type_name(val: any): str
 fn display_flag_options*(stream: std::File, flags: ^Flags)
+fn args(): []str
+
+fn init_flags*(): ^Flags {
+    flags := new(Flags)
+    return flags
+}
 
 fn (flags: ^Flags) add*(name: str, def: any, desc: str) {
     flag := new_flag(name, def, desc)
     flags.list = append(flags.list, flag^)
 }
 
-fn init_flags*(): ^Flags {
-    flags := new(Flags)
-    return flags
+fn (flags: ^Flags) parse*(): []str {
+    argv := args()
+    positional := []str{}
+    for i := 1; i < len(argv); i++ {   // start at 1, skip index 0
+        arg := argv[i]
+        printf("%s\n", arg)
+    }
+    return positional
 }
 
 fn new_flag(name: str, def: any, desc: str): ^Flag {
@@ -35,7 +47,7 @@ fn new_flag(name: str, def: any, desc: str): ^Flag {
 }
 
 fn flag_type_name(def: any): str {
-    switch v := type(def) {
+    switch _ := type(def) {
         case str:
             return "str"
         case int:
@@ -53,4 +65,13 @@ fn display_flag_options*(stream: std::File, flags: ^Flags) {
         fprintf(stream, "    --%s <%s>\n", flag.name, flag_type_name(flag.def))
         fprintf(stream, "        %s\n", flag.desc)
     }
+}
+
+fn args(): []str {
+    n := std::argc()
+    out := make([]str, n)
+    for i := 0; i < n; i++ {
+        out[i] = std::argv(i)
+    }
+    return out
 }

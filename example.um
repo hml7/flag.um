@@ -13,4 +13,5 @@ fn main() {
     flags := flag::init_flags()
     flags.add("help", false, "Print this help to stdout and exit with 0")
     usage(std::stdout(), flags)
+    _ := flags.parse()
 }
